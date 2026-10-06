@@ -1,0 +1,33 @@
+<!doctype html><html lang="ar" dir="rtl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>العمارات | إدارة عقارات جمعية الراكة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/style.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0f3557">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="عقارات الراكة">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon.svg">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head><body>
+<header class="hero no-print">
+  <div class="hero-inner">
+    <div class="brand-mark"><span class="brand-icon">⌂</span><div><b>إدارة عقارات جمعية الراكة</b><small>إدارة عقارات جمعية الراكة</small></div></div>
+    <div class="top-live"><strong id="liveTime">--:--:--</strong><span id="liveDate">--/--/----</span></div>
+    <button class="mobile-menu" onclick="toggleNav()">☰</button>
+  </div>
+</header>
+<nav id="nav" class="nav no-print">
+  <a href="index.html">الرئيسية</a>
+  <a href="buildings.html">العمارات</a>
+  <a href="entry.html">إدخال عملية</a>
+  <a href="reports.html">التقارير</a>
+  <a href="settings.html">الإعدادات</a> 
+</nav>
+<main class="container">
+<section class="page-title"><div><span class="eyebrow">إدارة البيانات</span><h1>العمارات والعدادات</h1><p>أضف العمارات واربط بكل عمارة عداداتها.</p></div></section>
+<section class="panel form-panel"><div class="panel-head"><div><h2>إضافة عمارة</h2><p>بيانات أساسية فقط</p></div></div>
+<form id="buildingForm" class="form-grid"><label>اسم / رقم العمارة<input id="buildingName" required placeholder="مثال: عمارة 121"></label><label>العنوان<input id="buildingAddress" placeholder="الحي أو العنوان"></label><button class="primary-btn" type="submit">＋ إضافة العمارة</button></form></section>
+<section class="panel"><div class="panel-head"><div><h2>العمارات المسجلة</h2><p id="countLabel"></p></div></div><div id="buildings" class="building-grid"></div></section>
+</main><script src="js/config.js"></script><script src="js/auth.js"></script><script src="js/app.js"></script><script src="js/buildings.js"></script></body></html>
