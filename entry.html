@@ -1,0 +1,45 @@
+<!doctype html><html lang="ar" dir="rtl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>إدخال عملية | إدارة عقارات جمعية الراكة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/style.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0f3557">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="عقارات الراكة">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon.svg">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head><body>
+<header class="hero no-print">
+  <div class="hero-inner">
+    <div class="brand-mark"><span class="brand-icon">⌂</span><div><b>إدارة عقارات جمعية الراكة</b><small>إدارة عقارات جمعية الراكة</small></div></div>
+    <div class="top-live"><strong id="liveTime">--:--:--</strong><span id="liveDate">--/--/----</span></div>
+    <button class="mobile-menu" onclick="toggleNav()">☰</button>
+  </div>
+</header>
+<nav id="nav" class="nav no-print">
+  <a href="index.html">الرئيسية</a>
+  <a href="buildings.html">العمارات</a>
+  <a href="entry.html">إدخال عملية</a>
+  <a href="reports.html">التقارير</a>
+  <a href="settings.html">الإعدادات</a>
+</nav>
+<main class="container">
+<section class="page-title"><div><span class="eyebrow">الحركة المالية</span><h1>إدخال عملية</h1><p>سجل الإيراد أو المصروف مع ربطه بالعمارة والعداد.</p></div></section>
+<section class="panel">
+<form id="entryForm" class="form-grid">
+<label>نوع العملية<select id="type"><option value="income">إيراد</option><option value="expense">مصروف</option></select></label>
+<label>العمارة<select id="building" required></select></label>
+<label>التاريخ<input id="date" type="date" required></label>
+<label>التصنيف<select id="category" required></select></label>
+<div id="meterArea" class="meter-area hidden"><div class="meter-head"><div><h3>عدادات العمارة</h3><p>أدخل مبلغ كل عداد بشكل مستقل.</p></div><span>⚡</span></div><div id="meters"></div></div>
+<label id="amountWrap">المبلغ<input id="amount" type="number" min="0" step=".01" placeholder="0.00"></label>
+<label>البيان<input id="note" placeholder="مثال: فاتورة شهر أغسطس"></label>
+<div class="form-actions"><button class="primary-btn" type="submit">حفظ العملية</button><a class="ghost-btn" href="index.html">إلغاء</a></div>
+</form>
+</section>
+<section class="panel"><div class="panel-head"><div><h2>آخر العمليات</h2><p>يمكنك تعديل أو حذف أي عملية.</p></div></div><div id="recent"></div></section>
+</main>
+<div id="modal" class="modal hidden"><div class="modal-box"><button class="modal-close" onclick="closeModal()">×</button><h2>تعديل العملية</h2><div id="editContent"></div></div></div>
+<script src="js/config.js"></script><script src="js/auth.js"></script><script src="js/app.js"></script><script src="js/entry.js"></script></body></html>
