@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>التقارير | إدارة عقارات جمعية الراكة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0f3557">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="عقارات الراكة">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon.svg">
+<link rel="stylesheet" href="css/print.css">
+<style>
+.report-page{max-width:1180px;margin:auto;padding:10px 20px 45px}
+.report-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin:10px 0 18px}
+.report-heading .eyebrow{margin-bottom:2px}
+.report-heading h1{margin:2px 0;font-size:30px}
+.report-heading p{margin:0;color:var(--muted);font-size:13px}
+.report-actions{display:flex;gap:8px;flex-wrap:wrap}
+.report-actions button{font-family:inherit;border:0;border-radius:11px;padding:11px 17px;font-weight:800;cursor:pointer}
+.report-actions .print-btn{background:var(--navy);color:#fff}
+.report-actions .clear-btn{background:#edf1f5;color:var(--navy)}
+.report-filter{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:var(--shadow);margin-bottom:15px}
+.report-filter-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.report-filter-head h2{font-size:17px;margin:0}
+.report-filter-head span{font-size:12px;color:var(--muted)}
+.report-filter-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.report-filter-grid label{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:800}
+.report-filter-grid input,.report-filter-grid select{font-family:inherit;border:1px solid #d8dfe7;border-radius:10px;padding:11px 12px;background:#fff;color:var(--ink);outline:0;width:100%}
+.report-filter-grid input:focus,.report-filter-grid select:focus{border-color:#6b9aba;box-shadow:0 0 0 3px #22658f12}
+.report-filter-actions{display:flex;justify-content:flex-start;gap:8px;margin-top:13px}
+.report-filter-actions button{font-family:inherit;border:0;border-radius:10px;padding:10px 16px;font-weight:800;cursor:pointer}
+.report-filter-actions .show-btn{background:var(--navy);color:#fff}
+.report-filter-actions .reset-btn{background:#edf1f5;color:var(--navy)}
+.report-paper{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:var(--shadow)}
+.report-paper-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.report-paper-brand{font-size:12px;color:var(--blue);font-weight:800}
+.report-paper-head h2{margin:4px 0 3px;font-size:24px}
+.report-paper-head p{margin:0;color:var(--muted);font-size:12px}
+.report-badge{background:#eaf1f7;color:var(--navy);border-radius:12px;padding:8px 12px;font-size:12px;font-weight:800;white-space:nowrap}
+.report-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:18px 0}
+.report-kpi{border:1px solid var(--line);border-radius:13px;padding:12px 13px;background:linear-gradient(180deg,#fff,#fbfcfd);min-width:0}
+.report-kpi span{display:block;color:var(--muted);font-size:12px;font-weight:700}
+.report-kpi strong{display:block;font-size:20px;line-height:1.25;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.report-kpi small{color:var(--muted);font-size:10px}
+.report-kpi.income strong{color:#22658f}
+.report-kpi.expense strong{color:var(--red)}
+.report-kpi.net strong{color:var(--green)}
+.report-kpi.count strong{color:#6b46a8}
+.report-section{margin-top:20px}
+.report-section-head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:9px}
+.report-section-head h3{margin:0;font-size:16px}
+.report-section-head p{margin:0;color:var(--muted);font-size:11px}
+.report-table-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px}
+.report-table{width:100%;border-collapse:collapse;min-width:720px}
+.report-table th{background:var(--navy);color:#fff;padding:10px 9px;font-size:11px;text-align:right;white-space:nowrap}
+.report-table td{padding:10px 9px;border-bottom:1px solid var(--line);font-size:11px;white-space:nowrap}
+.report-table tr:last-child td{border-bottom:0}
+.report-table .amount{font-weight:800}
+.report-table .income-amount{color:var(--blue)}
+.report-table .expense-amount{color:var(--red)}
+.report-table .total-row td{background:#f4f7fa;font-weight:800}
+.type-pill{display:inline-flex;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:800}
+.type-pill.income{background:#e8f7f1;color:var(--green)}
+.type-pill.expense{background:#fff0ee;color:var(--red)}
+.report-empty{text-align:center!important;color:var(--muted);padding:25px!important}
+.report-note{margin-top:17px;padding:11px 13px;background:#f4f7fa;border:1px solid #dce5ed;border-radius:10px;color:#536274;font-size:11px}
+.report-footer{display:flex;justify-content:space-between;gap:10px;margin-top:18px;color:var(--muted);font-size:10px}
+@media(max-width:900px){
+ .report-filter-grid{grid-template-columns:repeat(2,1fr)}
+ .report-kpis{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:640px){
+ .report-page{padding:5px 12px 30px}
+ .report-heading{display:block}
+ .report-heading h1{font-size:24px}
+ .report-actions{margin-top:12px}
+ .report-actions button{flex:1}
+ .report-filter{padding:15px}
+ .report-filter-grid{grid-template-columns:1fr}
+ .report-kpis{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+ .report-kpi{padding:9px 7px;border-radius:11px}
+ .report-kpi strong{font-size:15px}
+ .report-paper{padding:15px}
+ .report-paper-head h2{font-size:20px}
+ .report-badge{display:none}
+}
+@media print{
+ .report-page{max-width:none;padding:0}
+ .report-paper{border:0;box-shadow:none;padding:0;border-radius:0}
+ .report-paper-head{padding-bottom:10px}
+ .report-kpis{gap:7px;margin:10px 0}
+ .report-kpi{padding:8px}
+ .report-section{margin-top:10px}
+ .report-table th,.report-table td{padding:6px 5px}
+ .report-footer{margin-top:8px}
+}
+
+.monthly-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.month-card{border:1px solid var(--line);border-radius:14px;background:#fff;padding:13px 14px}
+.month-card-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+.month-card-head strong{font-size:14px;color:var(--navy)}
+.month-card-head span{font-size:10px;color:var(--muted)}
+.month-lines{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.month-line{background:#f7f9fb;border-radius:9px;padding:8px 7px;min-width:0}
+.month-line span{display:block;color:var(--muted);font-size:9px;margin-bottom:2px}
+.month-line strong{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.month-line.income strong{color:var(--blue)}
+.month-line.expense strong{color:var(--red)}
+.month-line.net strong{color:var(--green)}
+@media(max-width:900px){.monthly-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){.monthly-cards{grid-template-columns:1fr}.month-card{padding:11px}.month-lines{gap:5px}}
+@media print{.monthly-cards{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.month-card{padding:8px}.month-lines{gap:4px}.month-line{padding:5px}}
+
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header class="hero no-print">
+  <div class="hero-inner">
+    <div class="brand-mark"><span class="brand-icon">⌂</span><div><b>إدارة عقارات جمعية الراكة</b><small>إدارة عقارات جمعية الراكة</small></div></div>
+    <div class="top-live"><strong id="liveTime">--:--:--</strong><span id="liveDate">--/--/----</span></div>
+    <button class="mobile-menu" onclick="toggleNav()">☰</button>
+  </div>
+</header>
+<nav id="nav" class="nav no-print">
+  <a href="index.html">الرئيسية</a>
+  <a href="buildings.html">العمارات</a>
+  <a href="entry.html">إدخال عملية</a>
+  <a href="reports.html">التقارير</a>
+  <a href="settings.html">الإعدادات</a>
+</nav>
+
+<main class="report-page">
+  <div class="report-heading no-print">
+    <div>
+      <span class="eyebrow">التقارير المالية</span>
+      <h1>التقارير</h1>
+      <p>تقرير واضح ومرتب حسب الفترة والعمارة ونوع العملية والبند.</p>
+    </div>
+    <div class="report-actions">
+      <button class="print-btn" onclick="printReport()">🖨 طباعة التقرير</button>
+    </div>
+  </div>
+
+  <section class="report-filter no-print">
+    <div class="report-filter-head">
+      <div><h2>فلترة التقرير</h2><span>حدد ما تريد ظهوره في التقرير</span></div>
+    </div>
+    <div class="report-filter-grid">
+      <label>من تاريخ<input id="dateFrom" type="date"></label>
+      <label>إلى تاريخ<input id="dateTo" type="date"></label>
+      <label>العمارة<select id="building"></select></label>
+      <label>نوع العملية<select id="operationType">
+        <option value="all">كل العمليات</option>
+        <option value="income">الإيرادات</option>
+        <option value="expense">المصروفات</option>
+      </select></label>
+      <label>البند<select id="categoryFilter"><option value="all">كل البنود</option></select></label>
+    </div>
+    <div class="report-filter-actions">
+      <button class="show-btn" onclick="renderReport()">عرض التقرير</button>
+      <button class="reset-btn" onclick="resetReportFilters()">مسح الفلاتر</button>
+    </div>
+  </section>
+
+  <section class="report-paper" id="printReport">
+    <div class="report-paper-head">
+      <div>
+        <div class="report-paper-brand">إدارة عقارات جمعية الراكة</div>
+        <h2 id="reportTitle">التقرير المالي</h2>
+        <p id="reportScope">كل الفترات • جميع العمارات • كل العمليات • كل البنود</p>
+      </div>
+      <div class="report-badge">تقرير مالي</div>
+    </div>
+
+    <div class="report-kpis">
+      <div class="report-kpi income"><span>إجمالي الإيرادات</span><strong id="rIncome">0</strong><small>ريال</small></div>
+      <div class="report-kpi expense"><span>إجمالي المصروفات</span><strong id="rExpense">0</strong><small>ريال</small></div>
+      <div class="report-kpi net"><span>صافي الفترة</span><strong id="rNet">0</strong><small>ريال</small></div>
+      <div class="report-kpi count"><span>عدد العمليات</span><strong id="rCount">0</strong><small>عملية</small></div>
+    </div>
+
+
+    <section class="report-section">
+      <div class="report-section-head">
+        <div><h3>الملخص الشهري</h3><p>إجمالي الإيرادات والمصروفات والصافي لكل شهر ضمن الفترة المحددة</p></div>
+      </div>
+      <div class="monthly-cards" id="monthlyCards"></div>
+    </section>
+    <section class="report-section">
+      <div class="report-section-head">
+        <div><h3>ملخص العمارات</h3><p>الإيرادات والمصروفات والصافي حسب العمارة</p></div>
+      </div>
+      <div class="report-table-wrap">
+        <table class="report-table">
+          <thead><tr><th>العمارة</th><th>إجمالي الإيرادات</th><th>إجمالي المصروفات</th><th>الصافي</th></tr></thead>
+          <tbody id="buildingSummaryRows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="report-section">
+      <div class="report-section-head">
+        <div><h3>تفاصيل العمليات</h3><p>جميع العمليات المطابقة للفلاتر المحددة</p></div>
+      </div>
+      <div class="report-table-wrap">
+        <table class="report-table">
+          <thead>
+            <tr><th>#</th><th>التاريخ</th><th>العمارة</th><th>نوع العملية</th><th>البند</th><th>العداد / الحساب</th><th>البيان</th><th>المبلغ</th></tr>
+          </thead>
+          <tbody id="transactionRows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="report-note">ملاحظة: الإيرادات تظهر بالقيمة التي تم إدخالها كاملة، والمصروفات مستقلة عنها ولا يتم خصمها من إجمالي الإيرادات.</div>
+    <div class="report-footer"><span>إدارة عقارات جمعية الراكة</span><span id="printDate"></span></div>
+  </section>
+</main>
+
+<script src="js/config.js"></script><script src="js/auth.js"></script>
+<script src="js/app.js"></script>
+<script src="js/reports.js"></script>
+</body>
+</html>
