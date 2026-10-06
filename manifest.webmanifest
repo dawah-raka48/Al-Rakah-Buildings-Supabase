@@ -1,0 +1,16 @@
+{
+  "name":"إدارة عقارات جمعية الراكة",
+  "short_name":"عقارات الراكة",
+  "description":"منصة إدارة عقارات جمعية الراكة",
+  "lang":"ar",
+  "dir":"rtl",
+  "start_url":"./index.html",
+  "scope":"./",
+  "display":"standalone",
+  "orientation":"any",
+  "background_color":"#f3f7fa",
+  "theme_color":"#0f3557",
+  "icons":[
+    {"src":"icons/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}
