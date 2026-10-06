@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تسجيل الدخول | إدارة عقارات جمعية الراكة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0f3557">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="عقارات الراكة">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon.svg">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="login-body">
+<div class="login-orb orb-a"></div><div class="login-orb orb-b"></div>
+<main class="login-card"> 
+  <div class="login-logo"><span>⌂</span><b>إدارة عقارات جمعية الراكة</b></div>
+  <h1>مرحبًا بك</h1><p>أدخل بيانات حسابك للدخول إلى إدارة عقارات جمعية الراكة</p>
+  <form id="loginForm">
+    <label>البريد الإلكتروني<input id="email" type="email" autocomplete="username" placeholder="name@example.com" autofocus></label><label>كلمة المرور<div class="password-wrap"><input id="password" type="password" inputmode="numeric" autocomplete="current-password" placeholder="••••" maxlength="80"><button type="button" onclick="togglePassword()">إظهار</button></div></label>
+    <div id="loginError" class="login-error"></div>
+    <button class="login-btn" type="submit">دخول إلى المنصة <span>←</span></button>
+  </form>
+  <small class="login-note">ملكية خاصة تابع لجمعية الدعوة بالراكة V4.0</small>
+</main>
+<script src="js/config.js"></script><script src="js/auth.js"></script>
+</body></html>
