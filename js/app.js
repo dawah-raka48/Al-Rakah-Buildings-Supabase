@@ -105,14 +105,14 @@ function normalizeSupabaseData(buildings,meters,transactions,categories){
   return {buildings:bs,transactions:ts,expenseCategories:cs};
 }
 
-async function syncFromGoogle(){
+async function syncFromSupabase(){
   startBusy();
   try{
-    if(!supabaseClient)throw new Error("اتصال Supabase غير متاح");
+    if(!supabaseClient) throw new Error("اتصال Supabase غير متاح");
     const [b,m,t,c]=await Promise.all([
       supabaseClient.from("buildings").select("*").order("created_at",{ascending:true}),
       supabaseClient.from("meters").select("*").order("created_at",{ascending:true}),
-      supabaseClient.from("transactions").select("*").order("date",{ascending:false}),
+      supabaseClient.from("transactions").select("*").order("date",{ascending:false}).order("created_at",{ascending:false}),
       supabaseClient.from("expense_categories").select("*").order("name",{ascending:true})
     ]);
     if(b.error)throw b.error;if(m.error)throw m.error;if(t.error)throw t.error;if(c.error)throw c.error;
@@ -121,29 +121,11 @@ async function syncFromGoogle(){
     return d;
   }finally{stopBusy()}
 }
-
 async function loadData(){
-  try{return await syncFromGoogle()}
-  catch(e){console.warn(e);return {
-    buildings:get(DB.buildings),transactions:get(DB.transactions),
-    expenseCategories:ensureExpenseCategories(),offline:true
-  }}
+  try{return await syncFromSupabase()}
+  catch(e){console.warn(e);return {buildings:get(DB.buildings),transactions:get(DB.transactions),expenseCategories:ensureExpenseCategories(),offline:true}}
 }
-
-function apiDate(v){if(!v)return "";if(typeof v==="string"&&/^\d{4}-\d{2}-\d{2}/.test(v))return v.slice(0,10);const d=new Date(v);return isNaN(d)?String(v).slice(0,10):d.toISOString().slice(0,10)}
-async function syncFromGoogle(){
-  startBusy();
-  try{
-    const r=await fetch(CONFIG.API_URL+"?action=all&token="+encodeURIComponent(authToken()),{cache:"no-store"}),d=await r.json();
-    if(!d.success){if(d.code==="AUTH_REQUIRED"){sessionStorage.removeItem(SESSION_KEY);location.href="login.html";}throw new Error(d.message||"تعذر قراءة Google Sheets");}
-    const bs=(d.buildings||[]).map(x=>({id:String(x.ID||""),name:String(x["اسم العمارة"]||""),address:String(x["العنوان"]||""),meters:[]}));
-    (d.meters||[]).forEach(x=>{const b=bs.find(b=>b.id===String(x["Building ID"]||""));if(b)b.meters.push({id:String(x.ID||""),buildingId:b.id,name:String(x["اسم العداد"]||""),number:String(x["رقم العداد"]||""),account:String(x["رقم الحساب"]||""),type:String(x["نوع العداد"]||"")})});
-    const ts=(d.transactions||[]).map(x=>({id:String(x.ID||""),buildingId:String(x["Building ID"]||""),date:apiDate(x["التاريخ"]),type:String(x["نوع العملية"]||""),category:String(x["التصنيف"]||""),amount:Number(x["المبلغ"]||0),note:String(x["البيان"]||""),meterId:String(x["Meter ID"]||""),meterName:String(x["اسم العداد"]||""),meterNumber:String(x["رقم العداد"]||""),meterAccount:String(x["رقم الحساب"]||"")}));
-    save(DB.buildings,bs);save(DB.transactions,ts);return {buildings:bs,transactions:ts};
-  }finally{stopBusy()}
-}
-async function loadData(){try{return await syncFromGoogle()}catch(e){console.warn(e);return {buildings:get(DB.buildings),transactions:get(DB.transactions),offline:true}}}
-
+function apiDate(v){if(!v)return "";return String(v).slice(0,10)}
 /* واجهة التنبيهات والوقت */
 function showNotice(message,type="success"){
   let box=document.getElementById("appNotice");
