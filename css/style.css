@@ -249,3 +249,103 @@ body.login-body .login-btn{width:100%!important}
 .period-filter-grid{grid-template-columns:1fr 1fr auto;align-items:end}
 .period-reset{height:46px;white-space:nowrap}
 @media(max-width:600px){.period-filter-grid{grid-template-columns:1fr 1fr}.period-reset{grid-column:1/-1;width:100%}}
+\n
+/* ===== تحسين صفحة الدخول ===== */
+.login-card{
+  width:min(440px,calc(100% - 32px));
+  padding:34px 32px 28px;
+}
+.login-logo{
+  gap:12px;
+  line-height:1.5;
+}
+.login-logo b{
+  font-size:18px;
+  font-weight:800;
+}
+.login-card h1{
+  margin:28px 0 6px;
+  font-size:27px;
+  line-height:1.35;
+}
+.login-card>p{
+  margin:0 0 25px;
+  line-height:1.8;
+}
+.login-card form{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+.login-card label{
+  display:block;
+  font-size:12px;
+  font-weight:800;
+  color:var(--ink);
+}
+.login-card label>input{
+  display:block;
+  width:100%;
+  box-sizing:border-box;
+  margin-top:7px;
+  min-height:46px;
+  padding:11px 13px;
+  border:1px solid #d8dfe7;
+  border-radius:11px;
+  outline:0;
+  background:#fff;
+  color:var(--ink);
+  font:inherit;
+  transition:.18s;
+}
+.login-card label>input:focus,
+.password-wrap:focus-within{
+  border-color:#168aad;
+  box-shadow:0 0 0 3px rgba(22,138,173,.10);
+}
+.password-wrap{
+  margin-top:7px;
+  min-height:46px;
+  box-sizing:border-box;
+  background:#fff;
+}
+.password-wrap input{
+  padding:11px 13px;
+  background:transparent;
+}
+.password-wrap button{
+  padding:0 14px;
+  font-size:12px;
+  font-weight:800;
+}
+.login-error{
+  min-height:18px;
+  margin-top:-4px;
+  text-align:center;
+  line-height:1.6;
+}
+.login-btn{
+  min-height:48px;
+  margin-top:0;
+  padding:12px 15px;
+  align-items:center;
+  font-size:14px;
+  transition:.18s;
+}
+.login-btn:hover{
+  filter:brightness(1.06);
+  transform:translateY(-1px);
+}
+.login-note{
+  margin-top:20px;
+}
+@media(max-width:450px){
+  .login-card{
+    width:calc(100% - 24px);
+    padding:27px 20px 23px;
+    border-radius:20px;
+  }
+  .login-logo b{font-size:16px}
+  .login-card h1{font-size:24px;margin-top:23px}
+  .login-card>p{font-size:11px;margin-bottom:21px}
+}
