@@ -1,4 +1,4 @@
-const CACHE="rakah-realestate-v5";
+const CACHE="rakah-realestate-v6";
 const ASSETS=[
   "./",
   "./index.html",
@@ -20,7 +20,7 @@ const ASSETS=[
   "./js/settings.js",
   "./icons/icon.svg",
   "./manifest.webmanifest",
-  "./data/initial-data.json.gz.b64"
+  "./data/initial-data.json"
 ];
 self.addEventListener("install",event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting()));
