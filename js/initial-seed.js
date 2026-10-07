@@ -1,5 +1,13 @@
 const INITIAL_SEED_VERSION="2026-10-07-v6";
 const INITIAL_SEED_KEY="srakah_initial_seed_version";
+async function upsertChunks(table,rows,size=50){
+  for(let i=0;i<rows.length;i+=size){
+    const chunk=rows.slice(i,i+size);
+    const {error}=await supabaseClient.from(table).upsert(chunk,{onConflict:"id"});
+    if(error)throw error;
+  }
+}
+
 async function importInitialData(){
   if(!supabaseClient)return;
   const {data:{session}}=await supabaseClient.auth.getSession();
