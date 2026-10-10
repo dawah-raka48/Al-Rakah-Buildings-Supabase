@@ -18,7 +18,10 @@ const DEFAULT_EXPENSE_CATEGORIES=[
 {id:"exp_ac_maint",name:"صيانة مكيف",active:true},{id:"exp_ac_buy",name:"شراء مكيف",active:true},
 {id:"exp_bath_maint",name:"صيانة حمام",active:true},{id:"exp_plumbing_buy",name:"شراء أدوات سباكة",active:true},
 {id:"exp_electric",name:"كهرباء",active:true},{id:"exp_water",name:"مياه",active:true},
-{id:"exp_clean",name:"نظافة",active:true},{id:"exp_guard",name:"حراسة",active:true},{id:"exp_other",name:"مصروف آخر",active:true}];
+{id:"exp_clean",name:"نظافة",active:true},{id:"exp_guard",name:"حراسة",active:true},{id:"exp_other",name:"مصروف آخر",active:true},
+{id:"exp_office_commission",name:"عمولة المكتب",active:true},{id:"exp_general_maintenance",name:"صيانة عامة",active:true},
+{id:"exp_rent_contract_renewal",name:"رسوم تجديد عقد الإيجار",active:true},{id:"exp_elevator_maintenance",name:"صيانة المصعد",active:true},
+{id:"exp_court_fees",name:"رسوم محكمة",active:true}];
 function ensureExpenseCategories(){const current=get(DB.expenseCategories);if(!current.length)save(DB.expenseCategories,DEFAULT_EXPENSE_CATEGORIES);return get(DB.expenseCategories)}
 function cats(t){if(t==="income")return ["إيجار","محل","موقف","إيراد آخر"];return ensureExpenseCategories().filter(x=>x.active!==false).map(x=>x.name)}
 function expenseCategories(){return ensureExpenseCategories()}
@@ -116,7 +119,16 @@ async function syncFromSupabase(){
       supabaseClient.from("expense_categories").select("*").order("name",{ascending:true})
     ]);
     if(b.error)throw b.error;if(m.error)throw m.error;if(t.error)throw t.error;if(c.error)throw c.error;
-    const d=normalizeSupabaseData(b.data,m.data,t.data,c.data);
+    // أضف الأصناف الافتراضية الناقصة إلى Supabase دون تكرار الأصناف الموجودة.
+    let categories=c.data||[];
+    const existingNames=new Set(categories.map(x=>String(x.name||"").trim()));
+    const missingCategories=DEFAULT_EXPENSE_CATEGORIES.filter(x=>!existingNames.has(x.name));
+    if(missingCategories.length){
+      const {data:inserted,error:categoryError}=await supabaseClient.from("expense_categories").upsert(missingCategories,{onConflict:"id"}).select();
+      if(categoryError)throw categoryError;
+      categories=[...categories,...(inserted||missingCategories)];
+    }
+    const d=normalizeSupabaseData(b.data,m.data,t.data,categories);
     save(DB.buildings,d.buildings);save(DB.transactions,d.transactions);save(DB.expenseCategories,d.expenseCategories);
     return d;
   }finally{stopBusy()}
