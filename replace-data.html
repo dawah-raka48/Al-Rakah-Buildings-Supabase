@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>استبدال بيانات العقارات</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+body{min-height:100vh;padding:24px;box-sizing:border-box}.replace-card{max-width:760px;margin:30px auto;background:#fff;border:1px solid var(--line);border-radius:20px;padding:26px;box-shadow:var(--shadow)}.replace-card h1{font-size:24px}.replace-card p{line-height:1.9;color:var(--muted)}.warning{padding:14px;border-radius:12px;background:#fff4e5;color:#8a4b08;line-height:1.9;margin:18px 0}.file-pick{display:block;border:2px dashed #c8d9e4;border-radius:14px;padding:24px;text-align:center;margin:18px 0}.file-pick input{display:block;margin:14px auto;max-width:100%}.result{white-space:pre-wrap;line-height:1.9;margin-top:16px}.replace-btn{background:#0f3557;color:white;border:0;border-radius:12px;padding:13px 20px;font:inherit;font-weight:800;cursor:pointer}.replace-btn:disabled{opacity:.5;cursor:not-allowed}.back{display:inline-block;margin-bottom:12px;color:#168aad}
+</style>
+</head>
+<body>
+<main class="replace-card">
+<a class="back" href="index.html">← العودة إلى لوحة التحكم</a>
+<h1>استبدال بيانات العقارات</h1>
+<p>ارفع ملف Excel الجديد لاستبدال بيانات العمارات والعدادات والعمليات المالية في Supabase مع الحفاظ على تصنيفات المصروفات وحسابات المستخدمين.</p>
+<div class="warning"><b>تنبيه:</b> ستتم مزامنة البيانات مع الملف المختار، وحذف السجلات الموجودة في قاعدة البيانات التي لا توجد في الملف. لا تغلق الصفحة أثناء التنفيذ. لا تبدأ قبل التأكد أن الملف هو النسخة الصحيحة.</div>
+<label class="file-pick">اختر ملف Excel (.xlsx)
+<input id="file" type="file" accept=".xlsx,.xls">
+<span id="preview">لم يتم اختيار ملف بعد.</span>
+</label>
+<button id="run" class="replace-btn" disabled>استبدال البيانات الآن</button>
+<div id="result" class="result" role="status"></div>
+</main>
+<script src="js/config.js"></script>
+<script>
+const fileInput=document.getElementById("file"),runButton=document.getElementById("run"),preview=document.getElementById("preview"),result=document.getElementById("result");
+let prepared=null;
+function val(v){return v===undefined||v===null?"":v}
+function dateTime(v){
+ if(v instanceof Date&&!isNaN(v))return v.toISOString();
+ if(typeof v==="number"){const d=XLSX.SSF.parse_date_code(v);if(d)return new Date(Date.UTC(d.y,d.m-1,d.d,d.H,d.M,Math.floor(d.S))).toISOString()}
+ const d=new Date(v);return isNaN(d)?"":d.toISOString()
+}
+function dateOnly(v){const d=dateTime(v);return d?d.slice(0,10):""}
+function text(v){return v===undefined||v===null?"":String(v)}
+function rows(sheet){return XLSX.utils.sheet_to_json(sheet,{defval:"",raw:true})}
+fileInput.addEventListener("change",async()=>{
+ prepared=null;runButton.disabled=true;result.textContent="";
+ const f=fileInput.files?.[0];if(!f)return;
+ try{
+  const wb=XLSX.read(await f.arrayBuffer(),{type:"array",cellDates:true});
+  for(const n of ["Buildings","Meters","Transactions"])if(!wb.Sheets[n])throw new Error("الملف يجب أن يحتوي على أوراق Buildings وMeters وTransactions.");
+  const B=rows(wb.Sheets.Buildings),M=rows(wb.Sheets.Meters),T=rows(wb.Sheets.Transactions);
+  if(!B.length||!M.length||!T.length)throw new Error("إحدى الأوراق فارغة؛ لم يتم إجراء أي تغيير.");
+  const buildings=B.map(r=>({id:text(r["ID"]),name:text(r["اسم العمارة"]),address:text(r["العنوان"]),created_at:dateTime(r["تاريخ الإضافة"])||new Date().toISOString()}));
+  const meters=M.map(r=>({id:text(r["ID"]),building_id:text(r["Building ID"]),name:text(r["اسم العداد"]),number:text(r["رقم العداد"]),account:text(r["رقم الحساب"]),type:text(r["نوع العداد"]),created_at:dateTime(r["تاريخ الإضافة"])||new Date().toISOString()}));
+  const transactions=T.map(r=>({id:text(r["ID"]),building_id:text(r["Building ID"]),date:dateOnly(r["التاريخ"]),type:text(r["نوع العملية"]),category:text(r["التصنيف"]),amount:Number(r["المبلغ"]||0),note:text(r["البيان"]),meter_id:text(r["Meter ID"])||null,meter_name:text(r["اسم العداد"]),meter_number:text(r["رقم العداد"]),meter_account:text(r["رقم الحساب"]),created_at:dateTime(r["تاريخ التسجيل"])||new Date().toISOString()}));
+  const ids=a=>new Set(a.map(x=>x.id));
+  if(buildings.some(x=>!x.id||!x.name)||meters.some(x=>!x.id||!x.building_id)||transactions.some(x=>!x.id||!x.building_id||!x.date||!["income","expense"].includes(x.type)))throw new Error("وجدت بيانات أساسية ناقصة أو غير صحيحة. لم يتم إجراء أي تغيير.");
+  const bIds=ids(buildings),mIds=ids(meters);
+  if(meters.some(x=>!bIds.has(x.building_id))||transactions.some(x=>!bIds.has(x.building_id))||transactions.some(x=>x.meter_id&&!mIds.has(x.meter_id)))throw new Error("توجد مراجع عمارات أو عدادات غير موجودة في الملف. لم يتم إجراء أي تغيير.");
+  if(bIds.size!==buildings.length||mIds.size!==meters.length||ids(transactions).size!==transactions.length)throw new Error("توجد معرفات مكررة داخل الملف. لم يتم إجراء أي تغيير.");
+  prepared={buildings,meters,transactions};
+  preview.textContent="جاهز: "+buildings.length+" عمارات، "+meters.length+" عدادًا، "+transactions.length+" عملية مالية.";
+  runButton.disabled=false;
+ }catch(e){preview.textContent="تعذر قراءة الملف: "+e.message}
+});
+async function chunksUpsert(table,rows){
+ for(let i=0;i<rows.length;i+=50){
+  const {error}=await supabaseClient.from(table).upsert(rows.slice(i,i+50),{onConflict:"id"});
+  if(error)throw new Error("خطأ أثناء تحديث "+table+": "+error.message);
+ }
+}
+async function deleteStale(table,keepIds){
+ const {data,error}=await supabaseClient.from(table).select("id");
+ if(error)throw new Error("تعذر قراءة "+table+": "+error.message);
+ const stale=(data||[]).map(x=>x.id).filter(id=>!keepIds.has(String(id)));
+ for(let i=0;i<stale.length;i+=50){
+  const {error:delError}=await supabaseClient.from(table).delete().in("id",stale.slice(i,i+50));
+  if(delError)throw new Error("تعذر حذف السجلات القديمة من "+table+": "+delError.message);
+ }
+ return stale.length;
+}
+runButton.addEventListener("click",async()=>{
+ if(!prepared)return;
+ if(!confirm("تأكيد الاستبدال؟ سيتم تحديث البيانات من الملف وحذف السجلات غير الموجودة فيه. لا يمكن التراجع تلقائيًا."))return;
+ runButton.disabled=true;fileInput.disabled=true;result.textContent="جاري التحقق من الحساب...";
+ try{
+  const {data:{session},error:sessionError}=await supabaseClient.auth.getSession();
+  if(sessionError||!session)throw new Error("سجّل الدخول إلى المنصة أولًا ثم افتح هذه الصفحة.");
+  result.textContent="1/6 تحديث العمارات...";
+  await chunksUpsert("buildings",prepared.buildings);
+  result.textContent="2/6 تحديث العدادات...";
+  await chunksUpsert("meters",prepared.meters);
+  result.textContent="3/6 تحديث العمليات المالية...";
+  await chunksUpsert("transactions",prepared.transactions);
+  result.textContent="4/6 حذف العمليات القديمة غير الموجودة في الملف...";
+  const removedT=await deleteStale("transactions",new Set(prepared.transactions.map(x=>x.id)));
+  result.textContent="5/6 حذف العدادات والعمارات القديمة...";
+  const removedM=await deleteStale("meters",new Set(prepared.meters.map(x=>x.id)));
+  const removedB=await deleteStale("buildings",new Set(prepared.buildings.map(x=>x.id)));
+  result.textContent="اكتملت مزامنة الملف بنجاح.\nالعمارات: "+prepared.buildings.length+"\nالعدادات: "+prepared.meters.length+"\nالعمليات المالية: "+prepared.transactions.length+"\nالسجلات القديمة المحذوفة: "+removedT+" عملية، "+removedM+" عداد، "+removedB+" عمارة.\nارجع إلى لوحة التحكم وحدّث الصفحة.";
+ }catch(e){result.textContent="توقفت العملية: "+e.message+"\nتحقق من اتصال الإنترنت وصلاحيات Supabase. البيانات التي تم تحديثها قبل الخطأ قد تكون محفوظة؛ لا تكرر العملية قبل مراجعة النتيجة."}
+ finally{runButton.disabled=false;fileInput.disabled=false}
+});
+</script>
+</body></html>
